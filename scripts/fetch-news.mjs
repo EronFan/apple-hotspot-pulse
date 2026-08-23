@@ -112,6 +112,54 @@ function toDateStr(d) {
   return `${y}-${m}-${day}`;
 }
 
+// ---------- 翻译：使用 Google 翻译免费接口（无需密钥） ----------
+const CHINESE_RATIO_RE = /[\u4e00-\u9fff]/g;
+
+function isMostlyChinese(text) {
+  const cn = text.match(CHINESE_RATIO_RE);
+  return cn && cn.length / text.length > 0.3;
+}
+
+async function translateText(text) {
+  // 已是中文则跳过
+  if (isMostlyChinese(text)) return text;
+  const url = 'https://translate.googleapis.com/translate_a/single'
+    + '?client=gtx&sl=auto&tl=zh-CN&dt=t&q=' + encodeURIComponent(text);
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 15000);
+  try {
+    const res = await fetch(url, { signal: controller.signal });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    const out = (data[0] ?? []).map(seg => seg?.[0] ?? '').join('');
+    return out.trim() || text;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+// 带并发限制的批量翻译，单条失败时保留英文原文
+async function translateItems(items) {
+  const CONCURRENCY = 4;
+  let done = 0;
+  async function worker(queue) {
+    while (queue.length) {
+      const item = queue.shift();
+      try {
+        item.summary = await translateText(item.summary);
+        item.title = await translateText(item.title);
+      } catch (err) {
+        console.warn(`翻译失败（保留原文）：${item.titleEn.slice(0, 40)}… · ${err.message}`);
+      }
+      done++;
+      if (done % 10 === 0) console.log(`翻译进度 ${done}`);
+      await new Promise(r => setTimeout(r, 300)); // 轻微限速，避免被接口限流
+    }
+  }
+  const queue = [...items];
+  await Promise.all(Array.from({ length: CONCURRENCY }, () => worker(queue)));
+}
+
 async function fetchFeed(feed) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 20000);
@@ -174,6 +222,7 @@ async function main() {
       const title = item.title;
       fresh.push({
         title,
+        titleEn: title, // 保留英文原标题
         summary: truncate(stripHtml(item.description)) || title,
         date: toDateStr(new Date(ts)),
         source: item.source,
@@ -187,6 +236,12 @@ async function main() {
     }
     console.log(`✓ ${feed.source}: 新增 ${count} 条`);
   });
+
+  // 翻译新增条目为中文（分类/评级/标签已基于英文原文完成）
+  if (fresh.length > 0) {
+    console.log(`开始翻译 ${fresh.length} 条新资讯…`);
+    await translateItems(fresh);
+  }
 
   // 分配自增 id 并合并排序
   const startId = archived.reduce((m, i) => Math.max(m, i.id), 0);

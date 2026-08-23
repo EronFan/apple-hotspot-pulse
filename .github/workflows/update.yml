@@ -1,10 +1,10 @@
 # Apple 热点脉搏 · 每日自动采集
-# 每天北京时间 08:30（UTC 00:30）抓取 RSS 资讯，更新 data/news.json 后自动提交发布
+# 每天北京时间 06:00（UTC 前一天 22:00）抓取 RSS 资讯，更新 data/news.json 后自动提交发布
 name: 每日采集更新
 
 on:
   schedule:
-    - cron: '30 0 * * *'  # UTC 00:30 = 北京时间 08:30
+    - cron: '0 22 * * *'  # UTC 22:00 = 北京时间次日 06:00
   workflow_dispatch: {}   # 支持在 Actions 页面手动触发
 
 permissions:
