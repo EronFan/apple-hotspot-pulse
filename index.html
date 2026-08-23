@@ -1,0 +1,1728 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Apple 热点脉搏 · iOS / iPhone / Apple 服务 · 每日精读</title>
+  <meta name="creative-medium" content="interactive-prototype" />
+  <meta name="description" content="实时追踪 Apple 生态热点资讯 — iOS 系统、iPhone 硬件、Apple 服务、监管商业、开发者生态每日精读" />
+  <style>
+    /* ---------- Reset & Base ---------- */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    :root {
+      --bg-primary: #f5f5f7;
+      --bg-secondary: #ffffff;
+      --bg-tertiary: #fafafa;
+      --text-primary: #1d1d1f;
+      --text-secondary: #6e6e73;
+      --text-tertiary: #86868b;
+      --accent-blue: #0071e3;
+      --accent-blue-hover: #0077ed;
+      --border-color: #d2d2d7;
+      --border-light: #e8e8ed;
+      --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      --card-shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.08);
+      --chip-bg: #f0f0f3;
+      --chip-bg-active: #e0e9f5;
+      --chip-text-active: #0071e3;
+      --search-bg: #ffffff;
+      --filter-bar-bg: rgba(245, 245, 247, 0.85);
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    [data-theme="dark"] {
+      --bg-primary: #000000;
+      --bg-secondary: #1c1c1e;
+      --bg-tertiary: #2c2c2e;
+      --text-primary: #f5f5f7;
+      --text-secondary: #a1a1a6;
+      --text-tertiary: #6e6e73;
+      --accent-blue: #2997ff;
+      --accent-blue-hover: #409cff;
+      --border-color: #38383a;
+      --border-light: #2c2c2e;
+      --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+      --card-shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.5);
+      --chip-bg: #2c2c2e;
+      --chip-bg-active: #1c3a5c;
+      --chip-text-active: #2997ff;
+      --search-bg: #1c1c1e;
+      --filter-bar-bg: rgba(28, 28, 30, 0.85);
+    }
+    
+    html, body {
+      height: 100%;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text",
+        "Helvetica Neue", Helvetica, Arial, "PingFang SC", "Hiragino Sans GB",
+        "Microsoft YaHei", sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      font-size: 15px;
+      line-height: 1.5;
+      transition: background-color var(--transition), color var(--transition);
+    }
+    
+    a { color: inherit; text-decoration: none; }
+    
+    /* ---------- Header ---------- */
+    .app-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--filter-bar-bg);
+      backdrop-filter: saturate(180%) blur(20px);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
+      border-bottom: 1px solid var(--border-light);
+      transition: background-color var(--transition), border-color var(--transition);
+    }
+    
+    .header-inner {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+    
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .brand-logo {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--text-primary);
+      color: var(--bg-secondary);
+      border-radius: 10px;
+    }
+    
+    .brand-text h1 {
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      line-height: 1.2;
+    }
+    
+    .brand-text p {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 2px;
+      line-height: 1.2;
+    }
+    
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .update-time {
+      font-size: 12px;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    .pulse-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #30d158;
+      box-shadow: 0 0 0 0 rgba(48, 209, 88, 0.5);
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(48, 209, 88, 0.5); }
+      70% { box-shadow: 0 0 0 8px rgba(48, 209, 88, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(48, 209, 88, 0); }
+    }
+    
+    .theme-toggle {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: none;
+      background: var(--chip-bg);
+      color: var(--text-primary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color var(--transition), transform 0.15s ease;
+    }
+    
+    .theme-toggle:hover { transform: scale(1.05); }
+    .theme-toggle:active { transform: scale(0.95); }
+
+    .header-btn {
+      padding: 8px 16px;
+      border-radius: 980px;
+      font-size: 13px;
+      font-weight: 500;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all var(--transition);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+      border: 1px solid var(--accent-blue);
+      background: transparent;
+      color: var(--accent-blue);
+    }
+
+    .header-btn:hover {
+      background: var(--accent-blue);
+      color: #fff;
+    }
+
+    .header-btn.primary {
+      background: var(--accent-blue);
+      color: #fff;
+      border-color: var(--accent-blue);
+    }
+
+    .header-btn.primary:hover {
+      background: var(--accent-blue-hover);
+      border-color: var(--accent-blue-hover);
+    }
+
+    .header-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+
+    .btn-spinner {
+      width: 12px;
+      height: 12px;
+      border: 2px solid currentColor;
+      border-right-color: transparent;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: inline-block;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* ---------- Toast ---------- */
+    .toast {
+      position: fixed;
+      top: 80px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-20px);
+      padding: 12px 20px;
+      border-radius: 12px;
+      background: rgba(29, 29, 31, 0.92);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 500;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .toast-icon {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #30d158;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    
+    /* ---------- Hero / Stats ---------- */
+    .hero-section {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 48px 24px 24px;
+    }
+    
+    .hero-title {
+      font-size: 42px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      margin-bottom: 12px;
+    }
+    
+    .hero-title .accent {
+      color: var(--accent-blue);
+    }
+    
+    .hero-subtitle {
+      font-size: 17px;
+      color: var(--text-secondary);
+      font-weight: 400;
+      margin-bottom: 32px;
+    }
+    
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+    }
+    
+    .stat-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-lg);
+      padding: 18px 20px;
+      transition: all var(--transition);
+    }
+    
+    .stat-label {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    .stat-value {
+      font-size: 26px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      line-height: 1.2;
+    }
+    
+    .stat-value .unit {
+      font-size: 14px;
+      color: var(--text-secondary);
+      font-weight: 400;
+      margin-left: 2px;
+    }
+    
+    /* ---------- Filter Bar ---------- */
+    /* ---------- Today Hot Section ---------- */
+    .hot-section {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 24px 40px;
+    }
+
+    .hot-section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .hot-section-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+
+    .hot-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #ff3b30 0%, #ff6b5b 100%);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+
+    .hot-badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #fff;
+      animation: pulse 2s infinite;
+    }
+
+    .hot-section-desc {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .hot-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      grid-template-rows: auto auto;
+      gap: 16px;
+    }
+
+    .hot-card {
+      position: relative;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-lg);
+      padding: 28px 28px 24px;
+      overflow: hidden;
+      transition: all var(--transition);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .hot-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--accent-blue), #5ac8fa);
+    }
+
+    a.hot-card-link:hover .hot-card {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 32px rgba(0, 113, 227, 0.15);
+      border-color: rgba(0, 113, 227, 0.3);
+    }
+
+    a.hot-card-link:hover .hot-card-title {
+      color: var(--accent-blue);
+    }
+
+    .hot-card.featured {
+      grid-row: span 2;
+      background: linear-gradient(145deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
+    }
+
+    .hot-card.featured::before {
+      height: 6px;
+      background: linear-gradient(90deg, #0071e3, #5856d6, #af52de);
+    }
+
+    .hot-card-ribbon {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      background: rgba(255, 59, 48, 0.12);
+      color: #ff3b30;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    [data-theme="dark"] .hot-card-ribbon {
+      background: rgba(255, 69, 58, 0.18);
+      color: #ff453a;
+    }
+
+    .hot-card-meta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+      font-size: 12px;
+      color: var(--text-tertiary);
+    }
+
+    .hot-card-category {
+      padding: 3px 8px;
+      border-radius: 5px;
+      background: var(--chip-bg);
+      color: var(--text-secondary);
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    .hot-card-title {
+      font-size: 18px;
+      font-weight: 600;
+      line-height: 1.4;
+      letter-spacing: -0.01em;
+      color: var(--text-primary);
+      margin-bottom: 12px;
+      transition: color var(--transition);
+    }
+
+    .hot-card.featured .hot-card-title {
+      font-size: 24px;
+      line-height: 1.35;
+      margin-bottom: 16px;
+    }
+
+    .hot-card-summary {
+      font-size: 14px;
+      line-height: 1.65;
+      color: var(--text-secondary);
+      flex: 1;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+
+    .hot-card.featured .hot-card-summary {
+      font-size: 15px;
+      -webkit-line-clamp: 6;
+    }
+
+    .hot-card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 16px;
+      border-top: 1px solid var(--border-light);
+      font-size: 12px;
+    }
+
+    .hot-card-source {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--text-tertiary);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 60%;
+    }
+
+    .hot-card-action {
+      color: var(--accent-blue);
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .filter-section {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 20px 24px;
+    }
+    
+    .filter-bar {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-lg);
+      padding: 18px 20px;
+      box-shadow: var(--card-shadow);
+      transition: all var(--transition);
+    }
+    
+    .filter-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    
+    .filter-row:last-child {
+      margin-bottom: 0;
+    }
+    
+    .filter-label {
+      flex-shrink: 0;
+      width: 72px;
+      font-size: 13px;
+      color: var(--text-secondary);
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    .filter-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      flex: 1;
+    }
+    
+    .chip {
+      padding: 6px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--border-light);
+      background: var(--bg-tertiary);
+      color: var(--text-secondary);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all var(--transition);
+      user-select: none;
+      white-space: nowrap;
+    }
+    
+    .chip:hover {
+      color: var(--text-primary);
+      border-color: var(--border-color);
+    }
+    
+    .chip.active {
+      background: var(--accent-blue);
+      border-color: var(--accent-blue);
+      color: #ffffff;
+    }
+    
+    .chip.multi.active {
+      background: var(--chip-bg-active);
+      border-color: transparent;
+      color: var(--chip-text-active);
+    }
+    
+    .search-wrapper {
+      flex: 1;
+      position: relative;
+      max-width: 320px;
+      margin-left: auto;
+    }
+    
+    .search-input {
+      width: 100%;
+      padding: 9px 14px 9px 38px;
+      border: 1px solid var(--border-light);
+      border-radius: 10px;
+      background: var(--search-bg);
+      color: var(--text-primary);
+      font-size: 14px;
+      font-family: inherit;
+      transition: all var(--transition);
+      outline: none;
+    }
+    
+    .search-input:focus {
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.12);
+    }
+    
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-tertiary);
+      pointer-events: none;
+    }
+    
+    .search-clear {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--text-tertiary);
+      color: var(--bg-secondary);
+      border: none;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      line-height: 1;
+    }
+    
+    .search-wrapper.has-value .search-clear {
+      display: flex;
+    }
+    
+    /* ---------- Results Header ---------- */
+    .results-header {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 8px 24px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .results-count {
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+    
+    .results-count strong {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+    
+    .sort-select {
+      padding: 6px 12px;
+      border: 1px solid var(--border-light);
+      border-radius: 8px;
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      font-size: 13px;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+    
+    .sort-select:focus {
+      outline: none;
+      border-color: var(--accent-blue);
+    }
+    
+    /* ---------- News Grid ---------- */
+    .news-grid {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 24px 64px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    
+    .news-card {
+      display: flex;
+      flex-direction: column;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-lg);
+      padding: 22px 24px;
+      transition: all var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .news-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--card-accent, var(--accent-blue));
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.3s ease;
+    }
+    
+    a.news-card-link:hover .news-card {
+      transform: translateY(-3px);
+      box-shadow: var(--card-shadow-hover);
+      border-color: var(--border-color);
+    }
+    
+    a.news-card-link:hover .news-card::before {
+      transform: scaleX(1);
+    }
+    
+    a.news-card-link:hover .card-title {
+      color: var(--accent-blue);
+    }
+    
+    .card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    
+    .card-meta-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .importance-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 9px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+    
+    .importance-badge.headline {
+      background: rgba(255, 59, 48, 0.1);
+      color: #ff3b30;
+    }
+    
+    [data-theme="dark"] .importance-badge.headline {
+      background: rgba(255, 59, 48, 0.18);
+      color: #ff453a;
+    }
+    
+    .importance-badge.important {
+      background: rgba(255, 149, 0, 0.1);
+      color: #ff9500;
+    }
+    
+    [data-theme="dark"] .importance-badge.important {
+      background: rgba(255, 149, 0, 0.18);
+      color: #ff9f0a;
+    }
+    
+    .importance-badge.normal {
+      background: rgba(134, 134, 139, 0.12);
+      color: var(--text-tertiary);
+    }
+    
+    .card-date {
+      font-size: 12px;
+      color: var(--text-tertiary);
+      font-variant-numeric: tabular-nums;
+    }
+    
+    .card-title {
+      font-size: 17px;
+      font-weight: 600;
+      line-height: 1.35;
+      letter-spacing: -0.01em;
+      margin-bottom: 10px;
+      color: var(--text-primary);
+      transition: color var(--transition);
+    }
+    
+    .card-summary {
+      font-size: 13.5px;
+      line-height: 1.6;
+      color: var(--text-secondary);
+      flex: 1;
+      margin-bottom: 16px;
+      display: -webkit-box;
+      -webkit-line-clamp: 4;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    
+    .card-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+    
+    .tag-pill {
+      padding: 3px 8px;
+      border-radius: 5px;
+      background: var(--chip-bg);
+      color: var(--text-secondary);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.01em;
+    }
+    
+    .card-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 14px;
+      border-top: 1px solid var(--border-light);
+    }
+    
+    .card-source {
+      font-size: 12px;
+      color: var(--text-tertiary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      max-width: 65%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    
+    .source-type-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    
+    .source-type-dot.official { background: #30d158; }
+    .source-type-dot.media { background: var(--accent-blue); }
+    .source-type-dot.industry { background: #bf5af2; }
+    .source-type-dot.regulatory { background: #ff9500; }
+    
+    .card-action {
+      font-size: 12px;
+      color: var(--accent-blue);
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      opacity: 0.9;
+    }
+    
+    a.news-card-link:hover .card-action {
+      opacity: 1;
+    }
+    
+    /* ---------- Empty State ---------- */
+    .empty-state {
+      grid-column: 1 / -1;
+      padding: 64px 24px;
+      text-align: center;
+      color: var(--text-secondary);
+    }
+    
+    .empty-icon {
+      margin-bottom: 16px;
+      opacity: 0.3;
+    }
+    
+    .empty-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+    
+    .empty-desc {
+      font-size: 14px;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+    
+    /* ---------- Footer ---------- */
+    .app-footer {
+      border-top: 1px solid var(--border-light);
+      padding: 24px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-tertiary);
+      background: var(--bg-secondary);
+      transition: all var(--transition);
+    }
+    
+    /* ---------- Responsive ---------- */
+    @media (max-width: 1024px) {
+      .news-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .stats-row {
+        grid-template-columns: repeat(3, 1fr);
+      }
+      .hot-grid {
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: auto;
+      }
+      .hot-card.featured {
+        grid-column: span 2;
+        grid-row: auto;
+      }
+      .hot-card.featured .hot-card-title {
+        font-size: 20px;
+      }
+      .hot-card.featured .hot-card-summary {
+        -webkit-line-clamp: 3;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .header-inner { padding: 12px 16px; }
+      .hero-section { padding: 32px 16px 16px; }
+      .hero-title { font-size: 32px; }
+      .hero-subtitle { font-size: 15px; }
+      .stats-row { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+      .stat-card { padding: 14px 16px; }
+      .stat-value { font-size: 22px; }
+      .hot-section { padding: 0 16px 32px; }
+      .hot-section-title { font-size: 18px; }
+      .hot-section-desc { display: none; }
+      .hot-grid { grid-template-columns: 1fr; }
+      .hot-card.featured { grid-column: auto; }
+      .hot-card { padding: 22px 20px 18px; }
+      .hot-card-title { font-size: 17px; }
+      .hot-card.featured .hot-card-title { font-size: 19px; }
+      .filter-section { padding: 12px 16px; }
+      .filter-bar { padding: 14px; }
+      .filter-row { flex-direction: column; align-items: flex-start; gap: 10px; }
+      .filter-label { width: auto; }
+      .search-wrapper { max-width: 100%; width: 100%; margin-left: 0; }
+      .results-header { padding: 8px 16px 12px; }
+      .news-grid {
+        grid-template-columns: 1fr;
+        padding: 0 16px 48px;
+      }
+      .brand-text p { display: none; }
+      .update-time { display: none; }
+      .header-btn {
+        padding: 6px 12px;
+        font-size: 12px;
+      }
+      .header-actions { gap: 8px; }
+    }
+  </style>
+</head>
+<body data-theme="light">
+  <!-- Toast -->
+  <div class="toast" id="toast" role="alert" aria-live="polite">
+    <span class="toast-icon">✓</span>
+    <span id="toastText">操作成功</span>
+  </div>
+
+  <!-- Header -->
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="brand">
+        <div class="brand-logo">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h1>热点脉搏</h1>
+          <p>iOS / iPhone / Apple 服务 · 每日精读</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <div class="update-time">
+          <span class="pulse-dot"></span>
+          <span>更新于 2026年8月13日 · 周四</span>
+        </div>
+        <button class="header-btn" id="refreshBtn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="23 4 23 10 17 10"></polyline>
+            <polyline points="1 20 1 14 7 14"></polyline>
+            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+          </svg>
+          刷新缓存
+        </button>
+        <button class="header-btn primary" id="crawlBtn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+            <circle cx="12" cy="13" r="4"></circle>
+          </svg>
+          手动采集
+        </button>
+        <button class="theme-toggle" id="themeToggle" aria-label="切换主题">
+          <svg id="moonIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+          <svg id="sunIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
+            <circle cx="12" cy="12" r="4"></circle>
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero-section">
+    <h1 class="hero-title">Apple <span class="accent">热点脉搏</span></h1>
+    <p class="hero-subtitle">iOS / iPhone / Apple 服务 · 每日精读 — 实时追踪 Apple 生态热点资讯</p>
+    <div class="stats-row" id="statsRow"></div>
+  </section>
+
+  <!-- Today Hot -->
+  <section class="hot-section">
+    <div class="hot-section-header">
+      <div class="hot-section-title">
+        今日热点
+        <span class="hot-badge">
+          <span class="hot-badge-dot"></span>
+          头条
+        </span>
+      </div>
+      <div class="hot-section-desc">2026年8月13日 · 最值得关注的 5 条 Apple 生态资讯</div>
+    </div>
+    <div class="hot-grid" id="hotGrid"></div>
+  </section>
+
+  <!-- Filter -->
+  <section class="filter-section">
+    <div class="filter-bar">
+      <div class="filter-row">
+        <span class="filter-label">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+          </svg>
+          时间
+        </span>
+        <div class="filter-chips" id="timeChips"></div>
+        <div class="search-wrapper" id="searchWrapper">
+          <input type="text" class="search-input" id="searchInput" placeholder="搜索关键词..." />
+          <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <button class="search-clear" id="searchClear" aria-label="清除">×</button>
+        </div>
+      </div>
+      <div class="filter-row">
+        <span class="filter-label">类别</span>
+        <div class="filter-chips" id="categoryChips"></div>
+      </div>
+      <div class="filter-row">
+        <span class="filter-label">重要度</span>
+        <div class="filter-chips" id="importanceChips"></div>
+      </div>
+      <div class="filter-row">
+        <span class="filter-label">来源</span>
+        <div class="filter-chips" id="sourceChips"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Results Header -->
+  <div class="results-header">
+    <div class="results-count">共 <strong id="resultCount">0</strong> 条资讯</div>
+    <select class="sort-select" id="sortSelect">
+      <option value="date-desc">最新发布</option>
+      <option value="date-asc">最早发布</option>
+      <option value="importance">重要度优先</option>
+    </select>
+  </div>
+
+  <!-- News Grid -->
+  <main class="news-grid" id="newsGrid"></main>
+
+  <!-- Footer -->
+  <footer class="app-footer">
+    <p>Apple 热点脉搏 · 实时追踪 Apple 生态热点资讯 · 数据更新于 2026年8月13日</p>
+  </footer>
+
+  <script>
+    // =================================================================
+    //  资讯数据（全部内嵌，页面加载即渲染，无外部请求）
+    // =================================================================
+    var NEWS_DATA = [
+      {
+        id: 1,
+        title: '苹果推送 iOS 18.4 更新，带来多项功能升级与优化',
+        summary: '苹果推送 iOS 18.4 更新（内部版本号 22E240），距上次正式版仅间隔 20 天。更新包括：Apple Intelligence 优先通知、Image Playground 新增素描风格、新增 8 种语言支持；Apple Vision Pro 应用自动安装；Apple News+ 新增全球顶级食谱出版商内容；照片应用新增图库视图筛选器；Safari、家长控制、屏幕时间、App Store、播客、控制中心、家庭应用等多项优化；新增 10 种系统语言支持。',
+        date: '2026-08-12',
+        source: '射频微波器件采购网',
+        sourceUrl: 'http://www.ic-king.com/News/pgtsIos184gx_dldxgnsjyyh.html',
+        category: 'iOS 系统',
+        importance: '头条',
+        sourceType: '媒体',
+        tags: ['iOS 18.4', 'Apple Intelligence', '系统更新']
+      },
+      {
+        id: 2,
+        title: 'iOS 27 第三个公测版正式推送：Siri AI 能力大升级',
+        summary: '8 月 12 日苹果正式推送 iOS 27 和 iPadOS 27 第三个公测版。核心升级围绕 Siri AI 智能化重构和液态玻璃设计语言迭代展开。新版 Siri 支持网络信息检索、访问用户个人数据、识别屏幕当前内容，并可跨应用执行操作。Siri 新增独立应用入口，支持多轮对话和文本生成写作辅助。',
+        date: '2026-08-12',
+        source: '智迅文化',
+        sourceUrl: 'http://m.toutiao.com/group/7673023481482609162/',
+        category: 'iOS 系统',
+        importance: '头条',
+        sourceType: '媒体',
+        tags: ['iOS 27', 'Siri AI', 'Apple Intelligence', '公测版']
+      },
+      {
+        id: 3,
+        title: 'iOS 18 最好用 11 种功能排行榜',
+        summary: 'iOS 18 被誉为历来最大的系统升级，整理了网友评选的 11 大最佳功能：①锁定/隐藏 APP ②AI 修图（Clean Up）③电话录音功能 ④语音录音转文字 ⑤桌面 APP 及背景风格设定 ⑥密码 APP ⑦照片排版更新 ⑧自订锁定画面选项 ⑨强大讯息功能 ⑩自动分类邮件 ⑪地图显示地形模式。',
+        date: '2026-08-12',
+        source: '新識界',
+        sourceUrl: 'https://neww.tw/ios18/',
+        category: 'iOS 系统',
+        importance: '重要',
+        sourceType: '媒体',
+        tags: ['iOS 18', '功能评测', '用户反馈']
+      },
+      {
+        id: 4,
+        title: 'iOS 18 的 Android 风格功能实测',
+        summary: '深度评测 iOS 18 中借鉴 Android 的功能：主屏幕自定义、AI 驱动的 Siri（终于能理解上下文、跨应用操作）、隐私控制升级（微权限提示）、控制中心改版。结论：自定义解放和隐私控制是真正的游戏规则改变者。',
+        date: '2026-08-08',
+        source: 'TechWeu',
+        sourceUrl: 'https://techweu.com/i-tested-ios-18s-android-inspired-features-on-my-iphone-game-changer-or-gimmick',
+        category: 'iOS 系统',
+        importance: '一般',
+        sourceType: '媒体',
+        tags: ['iOS 18', '自定义', 'AI Siri', '隐私']
+      },
+      {
+        id: 5,
+        title: '美法院驳回 Apple 推迟 App Store 佣金审查请求',
+        summary: '美国加州北区地方法院驳回 Apple 关于推迟 App Store 外链购买佣金审查的动议，要求 Apple 在 24 小时内提交其拟议费用结构和成本依据。法官指出 Apple 有拖延倾向，案件已接近五周年。',
+        date: '2026-08-12',
+        source: 'Startup News',
+        sourceUrl: 'https://startupnews.fyi/gaming/apple-s-app-store-commission-review-proceeds-after-delay-denied',
+        category: '监管 & 商业',
+        importance: '头条',
+        sourceType: '监管文件',
+        tags: ['App Store', '反垄断', 'Epic Games', '佣金']
+      },
+      {
+        id: 6,
+        title: '欧盟因流媒体规则对 Apple 罚款 18 亿欧元',
+        summary: '欧盟因 Apple 违反音乐流媒体竞争规则，对其处以 18 亿欧元罚款。竞争专员 Margrethe Vestager 指控 Apple 十年来利用市场主导地位，限制第三方服务向用户提供 App Store 外的替代支付方式。此案源于 Spotify 的投诉。',
+        date: '2026-08-10',
+        source: 'CNBC',
+        sourceUrl: 'https://cnnbc.com/apple-fined-1-8bn-by-eu-for-breaking-streaming-rules',
+        category: '监管 & 商业',
+        importance: '头条',
+        sourceType: '监管文件',
+        tags: ['欧盟', '反垄断', '流媒体', 'Spotify', '罚款']
+      },
+      {
+        id: 7,
+        title: 'Musk 起诉 Apple 和 OpenAI 涉嫌 App Store 垄断',
+        summary: 'Elon Musk 旗下的 X 和 xAI 在德克萨斯州联邦法院起诉 Apple 和 OpenAI，指控双方的独家合作使 ChatGPT 在 iPhone 上占据主导地位，限制了 AI 应用的选择和创新。诉讼寻求数十亿美元赔偿。',
+        date: '2026-08-11',
+        source: 'CNNBC',
+        sourceUrl: 'https://cnnbc.com/elon-musk-sues-apple-and-openai-over-alleged-app-store-monopoly',
+        category: '监管 & 商业',
+        importance: '重要',
+        sourceType: '媒体',
+        tags: ['诉讼', 'Elon Musk', 'OpenAI', 'ChatGPT', 'AI 竞争']
+      },
+      {
+        id: 8,
+        title: 'Apple 或面临刑事藐视法庭调查',
+        summary: '美国地区法官裁定 Apple 故意违反其在 Epic Games 案中的禁令，可能面临刑事藐视法庭指控。法官指出一名 Apple 高管在宣誓作证时公然撒谎，将邀请联邦检察官评估是否提起刑事指控。',
+        date: '2026-08-12',
+        source: 'MetaWorld Media',
+        sourceUrl: 'https://metaworld.media/story/N6u65SdYQgSE',
+        category: '监管 & 商业',
+        importance: '重要',
+        sourceType: '监管文件',
+        tags: ['藐视法庭', 'Epic Games', '刑事调查']
+      },
+      {
+        id: 9,
+        title: '美法院驳回 Apple 推迟 App Store 费用提交请求',
+        summary: '美国联邦法院 8 月 11 日驳回 Apple 关于推迟提交 App Store 外链费用提案的请求，要求其在 24 小时内提交方案。Epic Games CEO Tim Sweeney 公开回应质疑 Apple 成本结构提案的透明度。',
+        date: '2026-08-12',
+        source: 'Fakta',
+        sourceUrl: 'https://www.fakta.co/court-rejects-apple-delay-app-store-fee',
+        category: '监管 & 商业',
+        importance: '一般',
+        sourceType: '监管文件',
+        tags: ['App Store', 'Epic Games', '诉讼']
+      },
+      {
+        id: 10,
+        title: 'Xcode 27 支持 AI 对话式编程',
+        summary: 'Xcode 27 引入深度集成的 AI 代理，支持自然语言对话式编程。AI 不仅能补全代码片段，还能理解上下文、跨文件修改整个代码库。支持集成 Anthropic、OpenAI 和 Google 的第三方模型。本地设备处理保护代码隐私。',
+        date: '2026-08-08',
+        source: 'AI D-A-M-N',
+        sourceUrl: 'https://ai-damn.com/apple-s-xcode-27-lets-developers-code-through-conversation-with-ai-1781755906809',
+        category: '开发者 & 生态',
+        importance: '头条',
+        sourceType: '媒体',
+        tags: ['Xcode 27', 'AI 编程', 'Swift', 'WWDC26']
+      },
+      {
+        id: 11,
+        title: 'UIKit 新增 API 助力 SwiftUI 迁移',
+        summary: 'UIKit 新增架构支持，使 SwiftUI 和 UIKit 更无缝地共存：包括通过新的 delegate 协议在 UIKit 应用中使用 SwiftUI scenes、更好的增量 SwiftUI 采用支持。',
+        date: '2026-08-11',
+        source: 'Ask WWDC',
+        sourceUrl: 'https://askwwdc.com/q/new-uikit-api-to-manage-controller-lifecycle-for-swiftui-adp',
+        category: '开发者 & 生态',
+        importance: '一般',
+        sourceType: '媒体',
+        tags: ['UIKit', 'SwiftUI', 'WWDC', 'API']
+      },
+      {
+        id: 12,
+        title: 'Apple Arcade 新增两款游戏',
+        summary: 'Apple Arcade 新增 Block Blast!+ 和 Art of Fauna: Cozy Puzzles+ 两款游戏，持续扩充其游戏订阅服务内容库。',
+        date: '2026-08-11',
+        source: 'Apple Newsroom',
+        sourceUrl: 'https://images.apple.com/in/newsroom/archive/',
+        category: 'Apple 服务 & 软件',
+        importance: '一般',
+        sourceType: 'Apple 官方',
+        tags: ['Apple Arcade', '游戏']
+      },
+      {
+        id: 13,
+        title: 'Apple 与 MLB 公布 9 月周五夜棒球赛程',
+        summary: 'Apple 与 MLB 公布了 9 月周五夜棒球赛程，Apple TV+ 持续布局体育流媒体内容。',
+        date: '2026-08-10',
+        source: 'Apple Newsroom',
+        sourceUrl: 'https://images.apple.com/in/newsroom/archive/',
+        category: 'Apple 服务 & 软件',
+        importance: '一般',
+        sourceType: 'Apple 官方',
+        tags: ['Apple TV+', 'MLB', '体育']
+      },
+      {
+        id: 14,
+        title: 'Apple Music 与播客体验迎来重大升级',
+        summary: 'Apple Music 引入 Playlist Playground（测试版）可根据文本描述自动生成歌单；音乐会功能强化本地演出发现；支持离线音乐识别。Apple Podcasts 支持 HLS 视频播放。CarPlay 首次开放第三方 AI 语音助手接入。',
+        date: '2026-08-07',
+        source: '综合报道',
+        sourceUrl: 'https://www.tenorshare.tw/ios-18/ios-17-7-vs-ios-18-differences-compared.html',
+        category: 'Apple 服务 & 软件',
+        importance: '重要',
+        sourceType: '媒体',
+        tags: ['Apple Music', '播客', 'CarPlay']
+      },
+      {
+        id: 15,
+        title: 'iPhone 17 系列规格详情曝光',
+        summary: 'iPhone 17 搭载 A19 Bionic 芯片（16 核神经引擎）、5 核 GPU、8GB RAM、256GB 起步存储。前置 18MP Center Stage 摄像头，后置 48MP Fusion 主摄。支持 Wi-Fi 7、USB-C、5G。配色包括黑色、薰衣草色、薄雾蓝、鼠尾草绿、白色。',
+        date: '2026-08-07',
+        source: '综合报道',
+        sourceUrl: 'https://www.tenorshare.tw/ios-18/ios-17-7-vs-ios-18-differences-compared.html',
+        category: 'iPhone 硬件',
+        importance: '重要',
+        sourceType: '产业链',
+        tags: ['iPhone 17', 'A19 Bionic', '规格']
+      }
+    ];
+
+    // =================================================================
+    //  常量配置
+    // =================================================================
+    var CATEGORIES = ['iOS 系统', 'iPhone 硬件', 'Apple 服务 & 软件', '监管 & 商业', '开发者 & 生态'];
+    var IMPORTANCES = ['头条', '重要', '一般'];
+    var SOURCE_TYPES = ['Apple 官方', '媒体', '产业链', '监管文件'];
+    var TIME_RANGES = ['今日', '本周', '本月', '全部'];
+
+    var CATEGORY_COLORS = {
+      'iOS 系统': '#0071e3',
+      'iPhone 硬件': '#ff9500',
+      'Apple 服务 & 软件': '#30d158',
+      '监管 & 商业': '#ff3b30',
+      '开发者 & 生态': '#bf5af2'
+    };
+
+    var IMPORTANCE_CLASS = { '头条': 'headline', '重要': 'important', '一般': 'normal' };
+    var SOURCE_TYPE_CLASS = {
+      'Apple 官方': 'official',
+      '媒体': 'media',
+      '产业链': 'industry',
+      '监管文件': 'regulatory'
+    };
+
+    // =================================================================
+    //  状态
+    // =================================================================
+    var state = {
+      timeRange: '本周',
+      categories: [],
+      importances: [],
+      sources: [],
+      searchQuery: '',
+      sortBy: 'date-desc'
+    };
+
+    // =================================================================
+    //  工具函数
+    // =================================================================
+    function getDateRange(range) {
+      var today = new Date('2026-08-13');
+      today.setHours(0, 0, 0, 0);
+      var end = new Date(today.getTime() + 24 * 60 * 60 * 1000 - 1);
+
+      if (range === '今日') {
+        return { start: today, end: end };
+      }
+      if (range === '本周') {
+        var day = today.getDay();
+        var start = new Date(today);
+        start.setDate(today.getDate() - day + (day === 0 ? -6 : 1));
+        return { start: start, end: end };
+      }
+      if (range === '本月') {
+        var startMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+        return { start: startMonth, end: end };
+      }
+      return { start: new Date(0), end: new Date(8640000000000000) };
+    }
+
+    function daysAgo(dateStr) {
+      var d = new Date(dateStr);
+      var today = new Date('2026-08-13');
+      var diff = Math.floor((today - d) / (1000 * 60 * 60 * 24));
+      if (diff === 0) return '今天';
+      if (diff === 1) return '昨天';
+      if (diff < 7) return diff + ' 天前';
+      var md = new Date(dateStr);
+      return (md.getMonth() + 1) + '月' + md.getDate() + '日';
+    }
+
+    function escapeHtml(str) {
+      var div = document.createElement('div');
+      div.appendChild(document.createTextNode(str));
+      return div.innerHTML;
+    }
+
+    // =================================================================
+    //  渲染统计卡片
+    // =================================================================
+    function renderStats() {
+      var total = NEWS_DATA.length;
+      var headline = NEWS_DATA.filter(function(n) { return n.importance === '头条'; }).length;
+
+      var catSet = {};
+      NEWS_DATA.forEach(function(n) { catSet[n.category] = true; });
+      var categories = Object.keys(catSet).length;
+      var srcSet = {};
+      NEWS_DATA.forEach(function(n) { srcSet[n.sourceType] = true; });
+      var sources = Object.keys(srcSet).length;
+      var todayCount = NEWS_DATA.filter(function(n) { return n.date === '2026-08-12'; }).length;
+
+      var stats = [
+        { label: '资讯总数', value: total, unit: '条', icon: '📊' },
+        { label: '今日更新', value: todayCount, unit: '条', icon: '📰' },
+        { label: '头条资讯', value: headline, unit: '条', icon: '🔥' },
+        { label: '分类覆盖', value: categories, unit: '个', icon: '🏷️' },
+        { label: '来源类型', value: sources, unit: '类', icon: '📡' }
+      ];
+
+      var html = stats.map(function(s) {
+        return '<div class="stat-card">' +
+          '<div class="stat-label">' + s.icon + ' ' + s.label + '</div>' +
+          '<div class="stat-value">' + s.value + '<span class="unit">' + s.unit + '</span></div>' +
+          '</div>';
+      }).join('');
+
+      document.getElementById('statsRow').innerHTML = html;
+    }
+
+    // =================================================================
+    //  渲染筛选 chips
+    // =================================================================
+    function renderChips(containerId, items, activeItems, multi) {
+      var container = document.getElementById(containerId);
+      var html = items.map(function(item) {
+        var isActive = multi ? activeItems.indexOf(item) >= 0 : activeItems === item;
+        var cls = 'chip' + (multi ? ' multi' : '') + (isActive ? ' active' : '');
+        return '<span class="' + cls + '" data-value="' + escapeHtml(item) + '">' + escapeHtml(item) + '</span>';
+      }).join('');
+      container.innerHTML = html;
+    }
+
+    // =================================================================
+    //  渲染今日热点
+    // =================================================================
+    function renderHot() {
+      var hotItems = NEWS_DATA.filter(function(n) { return n.importance === '头条'; })
+        .sort(function(a, b) { return new Date(b.date) - new Date(a.date); })
+        .slice(0, 5);
+
+      var grid = document.getElementById('hotGrid');
+      if (!grid || hotItems.length === 0) { return; }
+
+      var html = hotItems.map(function(item, index) {
+        var isFeatured = index === 0;
+        var cls = isFeatured ? 'hot-card featured' : 'hot-card';
+        var impClass = IMPORTANCE_CLASS[item.importance] || 'normal';
+        var srcClass = SOURCE_TYPE_CLASS[item.sourceType] || 'media';
+
+        var tagsHtml = item.tags.slice(0, 3).map(function(tag) {
+          return '<span class="tag-pill">' + escapeHtml(tag) + '</span>';
+        }).join('');
+
+        var inner =
+          '<div class="' + cls + '">' +
+            '<span class="hot-card-ribbon">TOP ' + (index + 1) + '</span>' +
+            '<div class="hot-card-meta">' +
+              '<span class="hot-card-category">' + escapeHtml(item.category) + '</span>' +
+              '<span>' + daysAgo(item.date) + '</span>' +
+            '</div>' +
+            '<h2 class="hot-card-title">' + escapeHtml(item.title) + '</h2>' +
+            (isFeatured ? '<div class="card-tags">' + tagsHtml + '</div>' : '') +
+            '<p class="hot-card-summary">' + escapeHtml(item.summary) + '</p>' +
+            '<div class="hot-card-footer">' +
+              '<span class="hot-card-source">' +
+                '<span class="source-type-dot ' + srcClass + '"></span>' +
+                escapeHtml(item.source) +
+              '</span>' +
+              (item.sourceUrl ? '<span class="hot-card-action">阅读全文 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span>' : '') +
+            '</div>' +
+          '</div>';
+
+        if (item.sourceUrl) {
+          return '<a class="hot-card-link" href="' + escapeHtml(item.sourceUrl) + '" target="_blank" rel="noopener noreferrer">' + inner + '</a>';
+        }
+        return inner;
+      }).join('');
+
+      grid.innerHTML = html;
+    }
+
+    // =================================================================
+    //  渲染资讯卡片
+    // =================================================================
+    function renderNews() {
+      var range = getDateRange(state.timeRange);
+      var filtered = NEWS_DATA.filter(function(item) {
+        var itemDate = new Date(item.date);
+        if (itemDate < range.start || itemDate > range.end) return false;
+
+        if (state.categories.length > 0 && state.categories.indexOf(item.category) < 0) return false;
+        if (state.importances.length > 0 && state.importances.indexOf(item.importance) < 0) return false;
+        if (state.sources.length > 0 && state.sources.indexOf(item.sourceType) < 0) return false;
+
+        if (state.searchQuery.trim()) {
+          var q = state.searchQuery.toLowerCase();
+          var haystack = (item.title + ' ' + item.summary + ' ' + item.source + ' ' + item.tags.join(' ')).toLowerCase();
+          if (haystack.indexOf(q) < 0) return false;
+        }
+
+        return true;
+      });
+
+      // 排序
+      if (state.sortBy === 'date-desc') {
+        filtered.sort(function(a, b) { return new Date(b.date) - new Date(a.date); });
+      } else if (state.sortBy === 'date-asc') {
+        filtered.sort(function(a, b) { return new Date(a.date) - new Date(b.date); });
+      } else if (state.sortBy === 'importance') {
+        var order = { '头条': 0, '重要': 1, '一般': 2 };
+        filtered.sort(function(a, b) {
+          var diff = order[a.importance] - order[b.importance];
+          if (diff !== 0) return diff;
+          return new Date(b.date) - new Date(a.date);
+        });
+      }
+
+      document.getElementById('resultCount').textContent = filtered.length;
+
+      var grid = document.getElementById('newsGrid');
+
+      if (filtered.length === 0) {
+        grid.innerHTML = '<div class="empty-state">' +
+          '<div class="empty-icon">' +
+            '<svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">' +
+              '<circle cx="11" cy="11" r="8"></circle>' +
+              '<line x1="21" y1="21" x2="16.65" y2="16.65"></line>' +
+            '</svg>' +
+          '</div>' +
+          '<h3 class="empty-title">没有找到匹配的资讯</h3>' +
+          '<p class="empty-desc">尝试调整筛选条件或搜索关键词，可能会找到更多结果。</p>' +
+          '</div>';
+        return;
+      }
+
+      var html = filtered.map(function(item) {
+        var accent = CATEGORY_COLORS[item.category] || '#0071e3';
+        var impClass = IMPORTANCE_CLASS[item.importance] || 'normal';
+        var srcClass = SOURCE_TYPE_CLASS[item.sourceType] || 'media';
+
+        var tagsHtml = item.tags.slice(0, 3).map(function(tag) {
+          return '<span class="tag-pill">' + escapeHtml(tag) + '</span>';
+        }).join('');
+
+        var cardInner =
+          '<div class="news-card" style="--card-accent:' + accent + '">' +
+            '<div class="card-top">' +
+              '<div class="card-meta-left">' +
+                '<span class="importance-badge ' + impClass + '">' + escapeHtml(item.importance) + '</span>' +
+              '</div>' +
+              '<span class="card-date">' + daysAgo(item.date) + '</span>' +
+            '</div>' +
+            '<h3 class="card-title">' + escapeHtml(item.title) + '</h3>' +
+            '<div class="card-tags">' + tagsHtml + '</div>' +
+            '<p class="card-summary">' + escapeHtml(item.summary) + '</p>' +
+            '<div class="card-bottom">' +
+              '<span class="card-source">' +
+                '<span class="source-type-dot ' + srcClass + '"></span>' +
+                escapeHtml(item.source) +
+              '</span>' +
+              (item.sourceUrl ? '<span class="card-action">阅读原文 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span>' : '') +
+            '</div>' +
+          '</div>';
+
+        if (item.sourceUrl) {
+          return '<a class="news-card-link" href="' + escapeHtml(item.sourceUrl) + '" target="_blank" rel="noopener noreferrer">' + cardInner + '</a>';
+        }
+        return cardInner;
+      }).join('');
+
+      grid.innerHTML = html;
+    }
+
+    // =================================================================
+    //  Toast 提示
+    // =================================================================
+    var toastTimer = null;
+    function showToast(message) {
+      var toast = document.getElementById('toast');
+      var toastText = document.getElementById('toastText');
+      if (!toast || !toastText) return;
+      toastText.textContent = message;
+      toast.classList.add('show');
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(function() {
+        toast.classList.remove('show');
+      }, 2500);
+    }
+
+    // =================================================================
+    //  事件绑定
+    // =================================================================
+    function bindEvents() {
+      // 时间筛选（单选）
+      document.getElementById('timeChips').addEventListener('click', function(e) {
+        var chip = e.target.closest('.chip');
+        if (!chip) return;
+        state.timeRange = chip.getAttribute('data-value');
+        renderChips('timeChips', TIME_RANGES, state.timeRange, false);
+        renderNews();
+      });
+
+      // 类别筛选（多选）
+      document.getElementById('categoryChips').addEventListener('click', function(e) {
+        var chip = e.target.closest('.chip');
+        if (!chip) return;
+        var val = chip.getAttribute('data-value');
+        var idx = state.categories.indexOf(val);
+        if (idx >= 0) state.categories.splice(idx, 1);
+        else state.categories.push(val);
+        renderChips('categoryChips', CATEGORIES, state.categories, true);
+        renderNews();
+      });
+
+      // 重要度筛选（多选）
+      document.getElementById('importanceChips').addEventListener('click', function(e) {
+        var chip = e.target.closest('.chip');
+        if (!chip) return;
+        var val = chip.getAttribute('data-value');
+        var idx = state.importances.indexOf(val);
+        if (idx >= 0) state.importances.splice(idx, 1);
+        else state.importances.push(val);
+        renderChips('importanceChips', IMPORTANCES, state.importances, true);
+        renderNews();
+      });
+
+      // 来源筛选（多选）
+      document.getElementById('sourceChips').addEventListener('click', function(e) {
+        var chip = e.target.closest('.chip');
+        if (!chip) return;
+        var val = chip.getAttribute('data-value');
+        var idx = state.sources.indexOf(val);
+        if (idx >= 0) state.sources.splice(idx, 1);
+        else state.sources.push(val);
+        renderChips('sourceChips', SOURCE_TYPES, state.sources, true);
+        renderNews();
+      });
+
+      // 搜索
+      var searchInput = document.getElementById('searchInput');
+      var searchWrapper = document.getElementById('searchWrapper');
+      var searchClear = document.getElementById('searchClear');
+
+      searchInput.addEventListener('input', function() {
+        state.searchQuery = searchInput.value;
+        if (searchInput.value) searchWrapper.classList.add('has-value');
+        else searchWrapper.classList.remove('has-value');
+        renderNews();
+      });
+
+      searchClear.addEventListener('click', function() {
+        searchInput.value = '';
+        state.searchQuery = '';
+        searchWrapper.classList.remove('has-value');
+        searchInput.focus();
+        renderNews();
+      });
+
+      // 排序
+      document.getElementById('sortSelect').addEventListener('change', function(e) {
+        state.sortBy = e.target.value;
+        renderNews();
+      });
+
+      // 刷新缓存
+      var refreshBtn = document.getElementById('refreshBtn');
+      if (refreshBtn) {
+        refreshBtn.addEventListener('click', function() {
+          var url = new URL(window.location.href);
+          url.searchParams.set('_t', Date.now().toString());
+          window.location.href = url.toString();
+        });
+      }
+
+      // 手动采集
+      var crawlBtn = document.getElementById('crawlBtn');
+      if (crawlBtn) {
+        crawlBtn.addEventListener('click', function() {
+          if (crawlBtn.disabled) return;
+          var originalHTML = crawlBtn.innerHTML;
+          crawlBtn.disabled = true;
+          crawlBtn.innerHTML = '<span class="btn-spinner"></span> 正在采集...';
+
+          setTimeout(function() {
+            crawlBtn.disabled = false;
+            crawlBtn.innerHTML = originalHTML;
+            showToast('采集完成，已更新 15 条资讯');
+          }, 2000);
+        });
+      }
+
+      // 主题切换
+      var themeToggle = document.getElementById('themeToggle');
+      var moonIcon = document.getElementById('moonIcon');
+      var sunIcon = document.getElementById('sunIcon');
+
+      themeToggle.addEventListener('click', function() {
+        var current = document.body.getAttribute('data-theme');
+        var next = current === 'dark' ? 'light' : 'dark';
+        document.body.setAttribute('data-theme', next);
+        try { localStorage.setItem('apple-pulse-theme', next); } catch (e) {}
+        moonIcon.style.display = next === 'dark' ? 'none' : '';
+        sunIcon.style.display = next === 'dark' ? '' : 'none';
+      });
+    }
+
+    // =================================================================
+    //  初始化主题
+    // =================================================================
+    function initTheme() {
+      var saved = null;
+      try { saved = localStorage.getItem('apple-pulse-theme'); } catch (e) {}
+      var theme = saved;
+      if (!theme) {
+        theme = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+      }
+      document.body.setAttribute('data-theme', theme);
+      document.getElementById('moonIcon').style.display = theme === 'dark' ? 'none' : '';
+      document.getElementById('sunIcon').style.display = theme === 'dark' ? '' : 'none';
+    }
+
+    // =================================================================
+    //  启动
+    // =================================================================
+    function init() {
+      initTheme();
+      renderStats();
+      renderHot();
+      renderChips('timeChips', TIME_RANGES, state.timeRange, false);
+      renderChips('categoryChips', CATEGORIES, state.categories, true);
+      renderChips('importanceChips', IMPORTANCES, state.importances, true);
+      renderChips('sourceChips', SOURCE_TYPES, state.sources, true);
+      renderNews();
+      bindEvents();
+    }
+
+    init();
+  </script>
+</body>
+</html>
