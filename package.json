@@ -1,6 +1,13 @@
 {
-  "name": "miaoda-design-html-app",
-  "version": "0.1.0",
+  "name": "apple-hotspot-pulse",
+  "version": "0.2.0",
   "private": true,
-  "type": "module"
+  "type": "module",
+  "scripts": {
+    "fetch": "node scripts/fetch-news.mjs",
+    "serve": "python3 -m http.server 8080"
+  },
+  "dependencies": {
+    "fast-xml-parser": "^5.2.5"
+  }
 }

@@ -1003,7 +1003,7 @@
       <div class="header-actions">
         <div class="update-time">
           <span class="pulse-dot"></span>
-          <span>更新于 2026年8月13日 · 周四</span>
+          <span id="updateTimeText">更新中…</span>
         </div>
         <button class="header-btn" id="refreshBtn">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -1050,7 +1050,7 @@
           头条
         </span>
       </div>
-      <div class="hot-section-desc">2026年8月13日 · 最值得关注的 5 条 Apple 生态资讯</div>
+      <div class="hot-section-desc" id="hotDesc">最值得关注的 5 条 Apple 生态资讯</div>
     </div>
     <div class="hot-grid" id="hotGrid"></div>
   </section>
@@ -1105,7 +1105,7 @@
 
   <!-- Footer -->
   <footer class="app-footer">
-    <p>Apple 热点脉搏 · 实时追踪 Apple 生态热点资讯 · 数据更新于 2026年8月13日</p>
+    <p>Apple 热点脉搏 · 实时追踪 Apple 生态热点资讯 · 数据更新于 <span id="footerDate">—</span></p>
   </footer>
 
   <script>
@@ -1335,7 +1335,7 @@
     //  工具函数
     // =================================================================
     function getDateRange(range) {
-      var today = new Date('2026-08-13');
+      var today = new Date();
       today.setHours(0, 0, 0, 0);
       var end = new Date(today.getTime() + 24 * 60 * 60 * 1000 - 1);
 
@@ -1357,7 +1357,8 @@
 
     function daysAgo(dateStr) {
       var d = new Date(dateStr);
-      var today = new Date('2026-08-13');
+      var today = new Date();
+      today.setHours(0, 0, 0, 0);
       var diff = Math.floor((today - d) / (1000 * 60 * 60 * 24));
       if (diff === 0) return '今天';
       if (diff === 1) return '昨天';
@@ -1370,6 +1371,44 @@
       var div = document.createElement('div');
       div.appendChild(document.createTextNode(str));
       return div.innerHTML;
+    }
+
+    function toDateStr(d) {
+      var y = d.getFullYear();
+      var m = ('0' + (d.getMonth() + 1)).slice(-2);
+      var day = ('0' + d.getDate()).slice(-2);
+      return y + '-' + m + '-' + day;
+    }
+
+    var WEEK_CN = ['日', '一', '二', '三', '四', '五', '六'];
+    function formatDateCn(dateIso) {
+      var d = dateIso ? new Date(dateIso) : new Date();
+      return d.getFullYear() + '年' + (d.getMonth() + 1) + '月' + d.getDate() + '日 · 周' + WEEK_CN[d.getDay()];
+    }
+
+    // =================================================================
+    //  动态数据加载（GitHub Actions 每日生成的 data/news.json）
+    //  加载失败时自动回退到页面内嵌数据
+    // =================================================================
+    function loadData(cacheBust) {
+      var url = 'data/news.json' + (cacheBust ? '?_t=' + Date.now() : '');
+      return fetch(url)
+        .then(function(res) {
+          if (!res.ok) throw new Error('HTTP ' + res.status);
+          return res.json();
+        })
+        .then(function(data) {
+          if (!data.items || !data.items.length) throw new Error('空数据');
+          NEWS_DATA = data.items;
+          document.getElementById('updateTimeText').textContent = '更新于 ' + formatDateCn(data.generatedAt);
+          document.getElementById('hotDesc').textContent =
+            formatDateCn(data.generatedAt) + ' · 最值得关注的 5 条 Apple 生态资讯';
+          document.getElementById('footerDate').textContent = formatDateCn(data.generatedAt).split(' · ')[0];
+          renderStats();
+          renderHot();
+          renderNews();
+          return data.items.length;
+        });
     }
 
     // =================================================================
@@ -1385,7 +1424,7 @@
       var srcSet = {};
       NEWS_DATA.forEach(function(n) { srcSet[n.sourceType] = true; });
       var sources = Object.keys(srcSet).length;
-      var todayCount = NEWS_DATA.filter(function(n) { return n.date === '2026-08-12'; }).length;
+      var todayCount = NEWS_DATA.filter(function(n) { return n.date === toDateStr(new Date()); }).length;
 
       var stats = [
         { label: '资讯总数', value: total, unit: '条', icon: '📊' },
@@ -1660,7 +1699,7 @@
         });
       }
 
-      // 手动采集
+      // 手动采集：真正重新拉取最新数据
       var crawlBtn = document.getElementById('crawlBtn');
       if (crawlBtn) {
         crawlBtn.addEventListener('click', function() {
@@ -1669,11 +1708,17 @@
           crawlBtn.disabled = true;
           crawlBtn.innerHTML = '<span class="btn-spinner"></span> 正在采集...';
 
-          setTimeout(function() {
-            crawlBtn.disabled = false;
-            crawlBtn.innerHTML = originalHTML;
-            showToast('采集完成，已更新 15 条资讯');
-          }, 2000);
+          loadData(true)
+            .then(function(count) {
+              showToast('已加载最新数据，共 ' + count + ' 条资讯');
+            })
+            .catch(function() {
+              showToast('暂无更新的数据，请稍后再试');
+            })
+            .then(function() {
+              crawlBtn.disabled = false;
+              crawlBtn.innerHTML = originalHTML;
+            });
         });
       }
 
@@ -1720,6 +1765,10 @@
       renderChips('sourceChips', SOURCE_TYPES, state.sources, true);
       renderNews();
       bindEvents();
+      // 优先加载每日采集生成的动态数据，失败则保持内嵌兜底数据
+      loadData().catch(function(err) {
+        console.warn('动态数据加载失败，使用内嵌数据：', err);
+      });
     }
 
     init();

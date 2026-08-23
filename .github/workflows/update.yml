@@ -1,0 +1,43 @@
+# Apple 热点脉搏 · 每日自动采集
+# 每天北京时间 08:30（UTC 00:30）抓取 RSS 资讯，更新 data/news.json 后自动提交发布
+name: 每日采集更新
+
+on:
+  schedule:
+    - cron: '30 0 * * *'  # UTC 00:30 = 北京时间 08:30
+  workflow_dispatch: {}   # 支持在 Actions 页面手动触发
+
+permissions:
+  contents: write
+
+concurrency:
+  group: daily-fetch
+  cancel-in-progress: false
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - run: npm ci
+
+      - name: 抓取资讯
+        run: node scripts/fetch-news.mjs
+
+      - name: 提交并推送
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if [ -n "$(git status --porcelain data/)" ]; then
+            git add data/news.json
+            git commit -m "每日采集：$(date -u +%Y-%m-%d) 更新资讯数据"
+            git push
+          else
+            echo "无新增数据，跳过提交"
+          fi
